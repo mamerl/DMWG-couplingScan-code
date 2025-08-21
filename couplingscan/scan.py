@@ -77,6 +77,10 @@ class DMModelScan(abc.ABC):
 
     def __post_init__(self):
 
+        # log some information about the CM energy and 
+        # pdf set that will be used for calculations    
+        logger.info("\tscan will use PDF set '%s' with sqrt(ECM) = %s GeV", self.pdfset, str(np.sqrt(self.ECM)))
+            
         # Various safety controls:
         # If any starting parameter is just a float, make it into a 1-item array.
         # For all the others, make sure they have type float.
@@ -88,6 +92,7 @@ class DMModelScan(abc.ABC):
                 setattr(self,attr,np.array([attrval],dtype=float))
             else :
                 setattr(self,attr,attrval.astype(float))
+            logger.info("\t%s: %s", attr, str(getattr(self, attr).tolist()))
 
         # Check that the arrays we have been given match in shape where necessary.
         if (self.mmed.shape != self.mdm.shape) and not (len(self.mmed)==1 or len(self.mdm)==1) :
@@ -179,6 +184,10 @@ class DMScalarModelScan(DMModelScan):
     '''
     _coupling: str = 'scalar'
 
+    def __post_init__(self):
+        logger.info("Initialised a new DMScalarModelScan with the following configuration:")
+        super().__post_init__()
+
     def mediator_total_width(self):
         return self.mediator_partial_width_quarks() + self.mediator_partial_width_dm() + self.mediator_partial_width_gluon()
     
@@ -220,6 +229,10 @@ class DMPseudoModelScan(DMModelScan):
     '''
     _coupling: str = 'pseudo'
 
+    def __post_init__(self):
+        logger.info("Initialised a new DMPseudoModelScan with the following configuration:")
+        super().__post_init__()
+
     def mediator_total_width(self):
         return self.mediator_partial_width_quarks() + self.mediator_partial_width_dm() + self.mediator_partial_width_gluon()
     
@@ -260,6 +273,10 @@ class DMVectorModelScan(DMModelScan):
     for a vector mediator.
     '''
     _coupling: str = 'vector'
+
+    def __post_init__(self):
+        logger.info("Initialised a new DMVectorModelScan with the following configuration:")
+        super().__post_init__()
 
     def mediator_total_width(self):
         return self.mediator_partial_width_quarks() + self.mediator_partial_width_dm() + self.mediator_partial_width_leptons()
@@ -368,6 +385,10 @@ class DMAxialModelScan(DMModelScan):
     for an axial vector mediator.
     '''
     _coupling: str = 'axial'
+
+    def __post_init__(self):
+        logger.info("Initialised a new DMAxialModelScan with the following configuration:")
+        super().__post_init__()
 
     def mediator_total_width(self):
         return self.mediator_partial_width_quarks() + self.mediator_partial_width_dm() + self.mediator_partial_width_leptons()
