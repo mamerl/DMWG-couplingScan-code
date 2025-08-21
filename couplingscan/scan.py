@@ -2,7 +2,6 @@ from dataclasses import dataclass
 from enum import Enum
 import numpy as np
 import abc
-import imp
 import importlib
 import scipy.integrate as integrate
 

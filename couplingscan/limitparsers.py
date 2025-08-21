@@ -2,6 +2,7 @@ from dataclasses import dataclass
 import numpy as np
 import abc
 import math
+import sys
 
 from couplingscan.scan import *
 
@@ -13,6 +14,7 @@ class CouplingLimit_Dijet(abc.ABC) :
     gdm: float
     gl: float
     coupling : str
+    ECM: float = 13000.**2 # GeV^2 (i.e. s^2)
 
     def __post_init__(self):
 
@@ -34,20 +36,26 @@ class CouplingLimit_Dijet(abc.ABC) :
         if (len(self.mdm) > 1) :
             print("Error: there should be a fixed DM mass for this type of limit!")
             print("If you are treating DM as decoupled, you can just set that value very high.")
-            exit(1)
+            sys.exit(1)
         if not ((self.mmed.shape == self.gq_limits.shape and len(self.gl)==1) or
                 (self.mmed.shape == self.gl.shape and len(self.gq)==1)) :
             print("""Error: you must have an equal number of mediator mass and visible limit (coupling) values,
                 and the other coupling to SM must be a single fixed value.""")
             print("The mediator and coupling limit points are meant to be matching x and y values. Please fix.")
-            exit(1)
+            sys.exit(1)
         
         if ('axial' not in self.coupling and 'vector' not in self.coupling) :
             print("This is only defined for axial or vector couplings!")
-            exit(1)
+            sys.exit(1)
 
     # This is dijet at a hadron collider: quarks in, quarks out.
     def extract_exclusion_depths(self,scan) :
+
+        # sanity check for the case where the scan to be performed 
+        # doesn't have a matching CM energy
+        if scan.ECM != self.ECM :
+            print("Error: the scan ECM value does not match the one in the limit plot!")
+            sys.exit(1)
 
         # Limit scenario is the one in which our input limit (and this class) is defined.
         # Scan scenario is the one we're going towards.
@@ -64,6 +72,7 @@ class CouplingLimit_Dijet(abc.ABC) :
                 gq=1.0,
                 gdm=self.gdm,
                 gl=self.gl,
+                ECM=self.ECM,
             )
         else :
             plot_world = DMVectorModelScan(
@@ -72,6 +81,7 @@ class CouplingLimit_Dijet(abc.ABC) :
                 gq=1.0,
                 gdm=self.gdm,
                 gl=self.gl,
+                ECM=self.ECM,
             )
 
         # Interpolate input gq limit curve to get all the mass points we need
@@ -103,6 +113,7 @@ class CrossSectionLimit1D(abc.ABC):
     gdm: float
     gl: float
     coupling : str
+    ECM: float = 13000.**2 # GeV^2 (i.e. s^2)
 
     def __post_init__(self):
         # Check that the arrays we have been given match in shape where necessary.
@@ -113,21 +124,21 @@ class CrossSectionLimit1D(abc.ABC):
                     print("Widths are interpreted as intrinsic width to mass ratio.")
                     print("The width value",width,"does not make sense in this context.")
                     print("If you have entered a percentage, please divide by 100 to convert to a fraction.")
-                    exit(1)
+                    sys.exit(1)
                 if (limit.shape != self.mmed_limit.shape) :
                     print("Error: limit masses and cross section values have different shapes!")
                     print("These are meant to be matching x and y values. Please fix.")
-                    exit(1)
+                    sys.exit(1)
         elif (self.xsec_limit.shape != self.mmed_limit.shape) :
             print("Error: limit masses and cross section values have different shapes!")
             print("These are meant to be matching x and y values. Please fix.")
-            exit(1)
+            sys.exit(1)
 
         # Theory curves:
         if (self.mmed_theory.shape != self.xsec_theory.shape) :
             print("Error: theory mass points and cross section values have mismatching shapes!")
             print("These are meant to be matching x and y values. Please fix.")
-            exit(1)
+            sys.exit(1)
 
         # Couplings and dark matter masses: since this is a single input plot,
         # they had better all be single-valued. Make sure they're floats.
@@ -138,7 +149,7 @@ class CrossSectionLimit1D(abc.ABC):
                     print("This needs to match an input plot that is one-dimensional and has just one theory line.")
                     print("You have not provided single values for one of mdm, gq, gdm, or gl.")
                     print("This is therefore ambiguious. Please provide exactly one value for each.")
-                    exit(1)
+                    sys.exit(1)
                 setattr(self,attr,float(attrval[0]))
             else :
                 setattr(self,attr,float(attrval))
@@ -171,6 +182,12 @@ class CrossSectionLimit1D(abc.ABC):
         # Where more than one observed limit given, interpolate to the 
         # best value. Linear interpolation will give the most reproducible result.
 
+        # sanity check for the case where the scan to be performed 
+        # doesn't have a matching CM energy
+        if scan.ECM != self.ECM :
+            print("Error: the scan ECM value does not match the one in the limit plot!")
+            sys.exit(1)
+
         # Extract full cross sections for scan scenario.
         xsec_scan = self.get_approx_xsec(scan)
 
@@ -189,6 +206,7 @@ class CrossSectionLimit1D(abc.ABC):
                 gq=self.gq,
                 gdm=self.gdm,
                 gl=self.gl,
+                ECM=self.ECM,
             )
         else :
             plot_world = DMVectorModelScan(
@@ -197,6 +215,7 @@ class CrossSectionLimit1D(abc.ABC):
                 gq=self.gq,
                 gdm=self.gdm,
                 gl=self.gl,
+                ECM=self.ECM,
             )
         xsec_plot_world = self.get_approx_xsec(plot_world)
 
@@ -234,6 +253,7 @@ class CrossSectionLimit1D(abc.ABC):
                 gq=self.gq,
                 gdm=self.gdm,
                 gl=self.gl,
+                ECM=self.ECM,
             )
         else :
             plot_world = DMVectorModelScan(
@@ -242,6 +262,7 @@ class CrossSectionLimit1D(abc.ABC):
                 gq=self.gq,
                 gdm=self.gdm,
                 gl=self.gl,
+                ECM=self.ECM,
             )
         xsec_plot_world = self.get_approx_xsec(plot_world)        
         rhs_couplinglimit = xsec_plot_world*(self.xsec_limit/self.xsec_theory)
@@ -298,7 +319,7 @@ class CrossSectionLimit_Dilepton(CrossSectionLimit1D) :
             noticeably with width for dilepton signatures. If you want to ignore this issue
             and use just one limit, you still need to pick a maximum intrinsic width for
             which to consider it valid. Please try again with a dictionary.""")
-            exit(1)
+            sys.exit(1)
 
         self.widths = list(self.xsec_limit.keys())
         self.xsec_limits = np.array([self.xsec_limit[i] for i in self.xsec_limit.keys()])
