@@ -43,8 +43,7 @@ class CouplingLimit_Dijet(abc.ABC) :
             sys.exit(1)
         if not ((self.mmed.shape == self.gq_limits.shape and len(self.gl)==1) or
                 (self.mmed.shape == self.gl.shape and len(self.gq)==1)) :
-            logger.error("""Error: you must have an equal number of mediator mass and visible limit (coupling) values,
-                and the other coupling to SM must be a single fixed value.""")
+            logger.error("Error: you must have an equal number of mediator mass and visible limit (coupling) values, and the other coupling to SM must be a single fixed value.")
             logger.error("The mediator and coupling limit points are meant to be matching x and y values. Please fix.")
             sys.exit(1)
         
@@ -296,17 +295,11 @@ class CrossSectionLimit_Dijet(CrossSectionLimit1D) :
         # Now add formatting for width, any other
         # dijet specific checks
         if type(self.xsec_limit) is dict :
-            logger.error("""You've supplied a dictionary for the limits. The appropriate limit to use
-            for each point will be selected based on width. For intrinsic width to mass ratios larger 
-            than the largest dictionary key given, a NaN will be returned.""")
+            logger.error("You've supplied a dictionary for the limits. The appropriate limit to use for each point will be selected based on width. For intrinsic width to mass ratios larger than the largest dictionary key given, a NaN will be returned.")
             self.widths = list(self.xsec_limit.keys())
             self.xsec_limits = np.array([self.xsec_limit[i] for i in self.widths])
         else :
-            logger.error("""You have supplied a single limit curve. This will be considered the appropriate
-            limit for all signal points up to an intrinsic width to mass ratio of {0}.
-            To adjust the maximum intrinsic width, please set the value of max_intrinsic_width at initialisation
-            or supply a dictionary instead. For intrinsic width to mass ratios larger than this value,
-            a NaN will be returned.""".format(self.max_intrinsic_width))
+            logger.error("You have supplied a single limit curve. This will be considered the appropriate limit for all signal points up to an intrinsic width to mass ratio of %s. To adjust the maximum intrinsic width, please set the value of max_intrinsic_width at initialisation or supply a dictionary instead. For intrinsic width to mass ratios larger than this value, a NaN will be returned.", str(self.max_intrinsic_width))
             self.widths = [self.max_intrinsic_width]
             self.xsec_limits = np.array([self.xsec_limit])
 
@@ -326,11 +319,7 @@ class CrossSectionLimit_Dilepton(CrossSectionLimit1D) :
         
         # If only a list given and not a dict for widths, print comprehensive error and quit.
         if type(self.xsec_limit) is not dict :
-            logger.error("""For dilepton limits, you need to provide input xsec limits as a dict
-            with corresponding intrinsic widths as keys. This is because the limits change
-            noticeably with width for dilepton signatures. If you want to ignore this issue
-            and use just one limit, you still need to pick a maximum intrinsic width for
-            which to consider it valid. Please try again with a dictionary.""")
+            logger.error("For dilepton limits, you need to provide input xsec limits as a dict with corresponding intrinsic widths as keys. This is because the limits change noticeably with width for dilepton signatures. If you want to ignore this issue and use just one limit, you still need to pick a maximum intrinsic width for which to consider it valid. Please try again with a dictionary.")
             sys.exit(1)
 
         self.widths = list(self.xsec_limit.keys())

@@ -17,17 +17,11 @@ class Rescaler(abc.ABC):
         self.check_ref_scan()
 
         if type(self.reference_exclusion_depths) is dict :
-            logger.info("""You've supplied a dictionary for the limits. The appropriate limit to use
-            for each point will be selected based on width. For intrinsic width to mass ratios larger 
-            than the largest dictionary key given, a NaN will be returned.""")
+            logger.info("You've supplied a dictionary for the limits. The appropriate limit to use for each point will be selected based on width. For intrinsic width to mass ratios larger than the largest dictionary key given, a NaN will be returned.")
             self.widths = list(self.reference_exclusion_depths.keys())
             self.exclusion_depths = np.array([self.reference_exclusion_depths[i] for i in self.widths])
         else :
-            logger.info("""You have supplied a single limit curve. This will be considered the appropriate
-            limit for all signal points up to an intrinsic width to mass ratio of %s.
-            To adjust the maximum intrinsic width, please set the value of max_intrinsic_width at initialisation
-            or supply a dictionary instead. For intrinsic width to mass ratios larger than this value,
-            a NaN will be returned.""", str(self.max_intrinsic_width))
+            logger.info("You have supplied a single limit curve. This will be considered the appropriate limit for all signal points up to an intrinsic width to mass ratio of %s. To adjust the maximum intrinsic width, please set the value of max_intrinsic_width at initialisation or supply a dictionary instead. For intrinsic width to mass ratios larger than this value, a NaN will be returned.", str(self.max_intrinsic_width))
             self.widths = [self.max_intrinsic_width]
             self.exclusion_depths = np.array([self.reference_exclusion_depths])     
 
@@ -262,10 +256,7 @@ class Rescaler(abc.ABC):
         
         for this_array in target_arrays :
             if (isinstance(this_array, np.ndarray) and len(this_array) > 1) :
-                logger.warning("""the hadronic rescaling method takes a long time!
-                We don't recommend that you use it for more than one target coupling scenario.
-                Instead, try rescaling to a single target and then using the propagator scaling method
-                to arrive at additional scenarios.""")
+                logger.warning("the hadronic rescaling method takes a long time! We don't recommend that you use it for more than one target coupling scenario. Instead, try rescaling to a single target and then using the propagator scaling method to arrive at additional scenarios.")
 
         # Calculate scale factor at each point
         reference_factor = self.reference_scan.hadron_level_xsec_monox_relative()
