@@ -1,6 +1,8 @@
 import numpy as np
 from couplingscan.scan import *
 import math
+import sys
+from couplingscan.logger_setup import logger
 
 # Each rescaler has a reference scan against which the others are scaled.
 @dataclass
@@ -15,28 +17,28 @@ class Rescaler(abc.ABC):
         self.check_ref_scan()
 
         if type(self.reference_exclusion_depths) is dict :
-            print("""You've supplied a dictionary for the limits. The appropriate limit to use
+            logger.info("""You've supplied a dictionary for the limits. The appropriate limit to use
             for each point will be selected based on width. For intrinsic width to mass ratios larger 
             than the largest dictionary key given, a NaN will be returned.""")
             self.widths = list(self.reference_exclusion_depths.keys())
             self.exclusion_depths = np.array([self.reference_exclusion_depths[i] for i in self.widths])
         else :
-            print("""You have supplied a single limit curve. This will be considered the appropriate
-            limit for all signal points up to an intrinsic width to mass ratio of {0}.
+            logger.info("""You have supplied a single limit curve. This will be considered the appropriate
+            limit for all signal points up to an intrinsic width to mass ratio of %s.
             To adjust the maximum intrinsic width, please set the value of max_intrinsic_width at initialisation
             or supply a dictionary instead. For intrinsic width to mass ratios larger than this value,
-            a NaN will be returned.""".format(self.max_intrinsic_width))
+            a NaN will be returned.""", str(self.max_intrinsic_width))
             self.widths = [self.max_intrinsic_width]
             self.exclusion_depths = np.array([self.reference_exclusion_depths])     
 
     def check_ref_scan(self) :
         '''Need to confirm the reference scan makes sense.
         Key items: only one value of each coupling.'''
-        if (self.reference_scan.gq == np.ndarray and len(self.reference_scan.gq) > 1) or \
-            (self.reference_scan.gdm == np.ndarray and len(self.reference_scan.gdm) > 1) or \
-            (self.reference_scan.gl == np.ndarray and len(self.reference_scan.gl) > 1) :
-            print("You can only have one unique value of each coupling in your reference scan!")
-            exit(1)
+        if (isinstance(self.reference_scan.gq, np.ndarray) and len(self.reference_scan.gq) > 1) or \
+            (isinstance(self.reference_scan.gdm, np.ndarray) and len(self.reference_scan.gdm) > 1) or \
+            (isinstance(self.reference_scan.gl, np.ndarray) and len(self.reference_scan.gl) > 1) :
+            logger.error("You can only have one unique value of each coupling in your reference scan!")
+            sys.exit(1)
     
     def check_models_methods(self, method, target_model) :
         # If more models or methods introduced, modify this list and the list of
@@ -68,13 +70,13 @@ class Rescaler(abc.ABC):
 
         if not valid :
             if not available : 
-                print("Error: this rescaling method is not available for the target model!")
-                print("Please choose a different method.")
-                exit(1)
+                logger.error("Error: this rescaling method is not available for the target model!")
+                logger.error("Please choose a different method.")
+                sys.exit(1)
             else :
-                print("Error: you cannot use this method to convert between",self.reference_scan._coupling,"and",target_model,"models!")
-                print("Please choose a different method.")
-                exit(1)                
+                logger.error("Error: you cannot use this method to convert between %s and %s models!", self.reference_scan._coupling, target_model)
+                logger.error("Please choose a different method.")
+                sys.exit(1)                
 
         return
 
@@ -116,8 +118,8 @@ class Rescaler(abc.ABC):
             target_scan = DMPseudoModelScan(mmed=target_mmed, mdm=target_mdm, gq=target_couplings[0],
                 gdm=target_couplings[1], gl=target_couplings[2])
         else :
-            print("Unrecognized target model!")
-            exit(1)
+            logger.error("Unrecognized target model!")
+            sys.exit(1)
 
         return target_scan
 
@@ -259,8 +261,8 @@ class Rescaler(abc.ABC):
         target_scan = self.create_target_scan(model, target_arrays)        
         
         for this_array in target_arrays :
-            if (this_array == np.ndarray and len(this_array) > 1) :
-                print("""Warning: the hadronic rescaling method takes a long time!
+            if (isinstance(this_array, np.ndarray) and len(this_array) > 1) :
+                logger.warning("""the hadronic rescaling method takes a long time!
                 We don't recommend that you use it for more than one target coupling scenario.
                 Instead, try rescaling to a single target and then using the propagator scaling method
                 to arrive at additional scenarios.""")

@@ -3,7 +3,7 @@ import numpy as np
 import abc
 import math
 import sys
-
+from couplingscan.logger_setup import logger
 from couplingscan.scan import *
 
 @dataclass
@@ -17,7 +17,7 @@ class CouplingLimit_Dijet(abc.ABC) :
     ECM: float = 13000.**2 # GeV^2 (i.e. s^2)
 
     def __post_init__(self):
-
+        logger.info("Initialising new CouplingLimit_Dijet with parameters:")
         # Various safety controls:
         # If any starting parameter is just a float, make it into a 1-item array.
         # For all the others, make sure they have type float.
@@ -30,22 +30,25 @@ class CouplingLimit_Dijet(abc.ABC) :
             else :
                 setattr(self,attr,attrval.astype(float))
 
+            # log the value of the attribute after conversion
+            logger.info("\t%s : %s", attr, str(getattr(self, attr).tolist()))
+
         # Check that the arrays we have been given have the shapes we expect.
         # For the 1d visible limit like this, we expect mmed and one of the visible couplings to match.
         # The other has to have a single value, and there can be only one value of mdm.
         if (len(self.mdm) > 1) :
-            print("Error: there should be a fixed DM mass for this type of limit!")
-            print("If you are treating DM as decoupled, you can just set that value very high.")
+            logger.error("Error: there should be a fixed DM mass for this type of limit!")
+            logger.error("If you are treating DM as decoupled, you can just set that value very high.")
             sys.exit(1)
         if not ((self.mmed.shape == self.gq_limits.shape and len(self.gl)==1) or
                 (self.mmed.shape == self.gl.shape and len(self.gq)==1)) :
-            print("""Error: you must have an equal number of mediator mass and visible limit (coupling) values,
+            logger.error("""Error: you must have an equal number of mediator mass and visible limit (coupling) values,
                 and the other coupling to SM must be a single fixed value.""")
-            print("The mediator and coupling limit points are meant to be matching x and y values. Please fix.")
+            logger.error("The mediator and coupling limit points are meant to be matching x and y values. Please fix.")
             sys.exit(1)
         
         if ('axial' not in self.coupling and 'vector' not in self.coupling) :
-            print("This is only defined for axial or vector couplings!")
+            logger.error("This is only defined for axial or vector couplings!")
             sys.exit(1)
 
     # This is dijet at a hadron collider: quarks in, quarks out.
@@ -54,7 +57,7 @@ class CouplingLimit_Dijet(abc.ABC) :
         # sanity check for the case where the scan to be performed 
         # doesn't have a matching CM energy
         if scan.ECM != self.ECM :
-            print("Error: the scan ECM value does not match the one in the limit plot!")
+            logger.error("Error: the scan ECM value does not match the one in the limit plot!")
             sys.exit(1)
 
         # Limit scenario is the one in which our input limit (and this class) is defined.
@@ -121,23 +124,23 @@ class CrossSectionLimit1D(abc.ABC):
         if type(self.xsec_limit) is dict :
             for width, limit in self.xsec_limit.items() :
                 if width < 0 or width > 1.0 :
-                    print("Widths are interpreted as intrinsic width to mass ratio.")
-                    print("The width value",width,"does not make sense in this context.")
-                    print("If you have entered a percentage, please divide by 100 to convert to a fraction.")
+                    logger.error("Widths are interpreted as intrinsic width to mass ratio.")
+                    logger.error("The width value %s does not make sense in this context.", str(width))
+                    logger.error("If you have entered a percentage, please divide by 100 to convert to a fraction.")
                     sys.exit(1)
                 if (limit.shape != self.mmed_limit.shape) :
-                    print("Error: limit masses and cross section values have different shapes!")
-                    print("These are meant to be matching x and y values. Please fix.")
+                    logger.error("Error: limit masses and cross section values have different shapes!")
+                    logger.error("These are meant to be matching x and y values. Please fix.")
                     sys.exit(1)
         elif (self.xsec_limit.shape != self.mmed_limit.shape) :
-            print("Error: limit masses and cross section values have different shapes!")
-            print("These are meant to be matching x and y values. Please fix.")
+            logger.error("Error: limit masses and cross section values have different shapes!")
+            logger.error("These are meant to be matching x and y values. Please fix.")
             sys.exit(1)
 
         # Theory curves:
         if (self.mmed_theory.shape != self.xsec_theory.shape) :
-            print("Error: theory mass points and cross section values have mismatching shapes!")
-            print("These are meant to be matching x and y values. Please fix.")
+            logger.error("Error: theory mass points and cross section values have mismatching shapes!")
+            logger.error("These are meant to be matching x and y values. Please fix.")
             sys.exit(1)
 
         # Couplings and dark matter masses: since this is a single input plot,
@@ -146,15 +149,16 @@ class CrossSectionLimit1D(abc.ABC):
             attrval = getattr(self,attr)
             if isinstance(attrval,list) or type(attrval) is np.ndarray :
                 if len(attrval) > 1 :
-                    print("This needs to match an input plot that is one-dimensional and has just one theory line.")
-                    print("You have not provided single values for one of mdm, gq, gdm, or gl.")
-                    print("This is therefore ambiguious. Please provide exactly one value for each.")
+                    logger.error("This needs to match an input plot that is one-dimensional and has just one theory line.")
+                    logger.error("You have not provided single values for one of mdm, gq, gdm, or gl.")
+                    logger.error("This is therefore ambiguious. Please provide exactly one value for each.")
                     sys.exit(1)
                 setattr(self,attr,float(attrval[0]))
             else :
                 setattr(self,attr,float(attrval))
 
-        pass
+            # log the value of the attribute after conversion
+            logger.info("\t%s : %s", attr, str(getattr(self, attr)))
 
     @abc.abstractmethod
     def get_approx_xsec(self, scan) :
@@ -185,7 +189,7 @@ class CrossSectionLimit1D(abc.ABC):
         # sanity check for the case where the scan to be performed 
         # doesn't have a matching CM energy
         if scan.ECM != self.ECM :
-            print("Error: the scan ECM value does not match the one in the limit plot!")
+            logger.error("Error: the scan ECM value does not match the one in the limit plot!")
             sys.exit(1)
 
         # Extract full cross sections for scan scenario.
@@ -280,18 +284,19 @@ class CrossSectionLimit_Dijet(CrossSectionLimit1D) :
     max_intrinsic_width : float = 0.1
 
     def __post_init__(self) :
+        logger.info("Initialising new CrossSectionLimit_Dijet with parameters:")
         super().__post_init__()
 
         # Now add formatting for width, any other
         # dijet specific checks
         if type(self.xsec_limit) is dict :
-            print("""You've supplied a dictionary for the limits. The appropriate limit to use
+            logger.error("""You've supplied a dictionary for the limits. The appropriate limit to use
             for each point will be selected based on width. For intrinsic width to mass ratios larger 
             than the largest dictionary key given, a NaN will be returned.""")
             self.widths = list(self.xsec_limit.keys())
             self.xsec_limits = np.array([self.xsec_limit[i] for i in self.widths])
         else :
-            print("""You have supplied a single limit curve. This will be considered the appropriate
+            logger.error("""You have supplied a single limit curve. This will be considered the appropriate
             limit for all signal points up to an intrinsic width to mass ratio of {0}.
             To adjust the maximum intrinsic width, please set the value of max_intrinsic_width at initialisation
             or supply a dictionary instead. For intrinsic width to mass ratios larger than this value,
@@ -310,11 +315,12 @@ class CrossSectionLimit_Dijet(CrossSectionLimit1D) :
 class CrossSectionLimit_Dilepton(CrossSectionLimit1D) :
 
     def __post_init__(self):
+        logger.info("Initialising new CrossSectionLimit_Dilepton with parameters:")
         super().__post_init__()
         
         # If only a list given and not a dict for widths, print comprehensive error and quit.
         if type(self.xsec_limit) is not dict :
-            print("""For dilepton limits, you need to provide input xsec limits as a dict
+            logger.error("""For dilepton limits, you need to provide input xsec limits as a dict
             with corresponding intrinsic widths as keys. This is because the limits change
             noticeably with width for dilepton signatures. If you want to ignore this issue
             and use just one limit, you still need to pick a maximum intrinsic width for
