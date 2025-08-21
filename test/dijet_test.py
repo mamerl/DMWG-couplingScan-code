@@ -14,6 +14,11 @@ plot_tag = ""
 
 analysis_tag = "CMS-EXO-16-056"
 
+# for testing configuring ECM and pdfset differently
+# e.g. ECM = 13600.**2 and pdfset = "NNPDF30_nlo_as_0118_hessian"
+ECM = 13000.**2 # GeV^2
+pdfset = "NNPDF30_nlo_as_0118"
+
 # Extract HEPData into useable format
 with open("dijet_hepdata/hepdata_gqplot_cms36ifb.json", "r") as read_file:
 	data = json.load(read_file)
@@ -31,7 +36,9 @@ gq_limit = CouplingLimit_Dijet(
     mdm=10000,
     gdm=0.0,
     gl=0.0,
-    coupling='vector'
+    coupling='vector',
+	ECM=ECM,
+	pdfset=pdfset,
 )
 
 # This is what we want to get our limits in: a scan in A1 scenario with plenty of points.
@@ -45,6 +52,8 @@ scan_A1 = DMAxialModelScan(
 	gq=0.25,
 	gdm=1.0,
 	gl=0.0,
+	pdfset=pdfset,
+	ECM=ECM,
 )
 
 values = gq_limit.extract_exclusion_depths(scan_A1)
@@ -65,11 +74,11 @@ make_plot(scan_A1.mmed, scan_A1.mdm, V2_depths, [500, 3500], [0, 1700], analysis
 
 # Now get the other three scenarios via the gq plot directly.
 # Confirm they are identical.
-scan_A2 = DMAxialModelScan(mmed=target_xgrid.flatten(), mdm=target_ygrid.flatten(), gq=0.1, gdm=1.0, gl=0.1)
+scan_A2 = DMAxialModelScan(mmed=target_xgrid.flatten(), mdm=target_ygrid.flatten(), gq=0.1, gdm=1.0, gl=0.1, ECM=ECM, pdfset=pdfset)
 A2_direct = gq_limit.extract_exclusion_depths(scan_A2)
-scan_V1 = DMVectorModelScan(mmed=target_xgrid.flatten(), mdm=target_ygrid.flatten(), gq=0.25, gdm=1.0, gl=0.0)
+scan_V1 = DMVectorModelScan(mmed=target_xgrid.flatten(), mdm=target_ygrid.flatten(), gq=0.25, gdm=1.0, gl=0.0, ECM=ECM, pdfset=pdfset)
 V1_direct = gq_limit.extract_exclusion_depths(scan_V1)
-scan_V2 = DMVectorModelScan(mmed=target_xgrid.flatten(), mdm=target_ygrid.flatten(), gq=0.1, gdm=1.0, gl=0.01)
+scan_V2 = DMVectorModelScan(mmed=target_xgrid.flatten(), mdm=target_ygrid.flatten(), gq=0.1, gdm=1.0, gl=0.01, ECM=ECM, pdfset=pdfset)
 V2_direct = gq_limit.extract_exclusion_depths(scan_V2)
 make_plot(scan_A2.mmed, scan_A2.mdm, A2_direct, [500, 3500], [0, 1700], analysis_tag, "A2_from1dlimit", addPoints = True)
 make_plot(scan_V1.mmed, scan_V1.mdm, V1_direct, [500, 3500], [0, 1700], analysis_tag, "V1_from1dlimit", addPoints = True)
@@ -113,7 +122,9 @@ xsec_limit = CrossSectionLimit_Dijet(
 	gdm=1.0,
 	gl=0.0,
 	coupling='vector',
-	max_intrinsic_width=0.15
+	max_intrinsic_width=0.15,
+	ECM=ECM,
+	pdfset=pdfset,
 )
 
 # Get paper exclusion limits and make them into contours.

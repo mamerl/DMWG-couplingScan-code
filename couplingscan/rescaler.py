@@ -101,16 +101,16 @@ class Rescaler(abc.ABC):
         # Now create the appropriate scan.
         if target_ID == 'axial' : 
             target_scan = DMAxialModelScan(mmed=target_mmed, mdm=target_mdm, gq=target_couplings[0],
-                gdm=target_couplings[1], gl=target_couplings[2])
+                gdm=target_couplings[1], gl=target_couplings[2], ECM=self.reference_scan.ECM, pdfset=self.reference_scan.pdfset)
         elif target_ID == 'vector' :
             target_scan = DMVectorModelScan(mmed=target_mmed, mdm=target_mdm, gq=target_couplings[0],
-                gdm=target_couplings[1], gl=target_couplings[2])
+                gdm=target_couplings[1], gl=target_couplings[2], ECM=self.reference_scan.ECM, pdfset=self.reference_scan.pdfset)
         elif target_ID == 'scalar' :
             target_scan = DMScalarModelScan(mmed=target_mmed, mdm=target_mdm, gq=target_couplings[0],
-                gdm=target_couplings[1], gl=target_couplings[2])
+                gdm=target_couplings[1], gl=target_couplings[2], ECM=self.reference_scan.ECM, pdfset=self.reference_scan.pdfset)
         elif target_ID == 'pseudoscalar' :
             target_scan = DMPseudoModelScan(mmed=target_mmed, mdm=target_mdm, gq=target_couplings[0],
-                gdm=target_couplings[1], gl=target_couplings[2])
+                gdm=target_couplings[1], gl=target_couplings[2], ECM=self.reference_scan.ECM, pdfset=self.reference_scan.pdfset)
         else :
             logger.error("Unrecognized target model!")
             sys.exit(1)
@@ -281,8 +281,7 @@ class Rescaler(abc.ABC):
     def rescale_by_parton_level_xsec_monox(self,target_gq, target_gdm, target_gl, model=None):
         '''Rescale using parton-level cross sections.'''
 
-        print('''Warning: the parton-level cross section is not the best-performing rescaling method
-        in any hadron collider scenario. Consider using something else!''')
+        logger.warning("the parton-level cross section is not the best-performing rescaling method in any hadron collider scenario. Consider using something else!")
 
         # Check that this method of rescaling makes sense for the
         # target and reference scan types:

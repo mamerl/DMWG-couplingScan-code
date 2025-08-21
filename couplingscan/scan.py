@@ -92,7 +92,6 @@ class DMModelScan(abc.ABC):
                 setattr(self,attr,np.array([attrval],dtype=float))
             else :
                 setattr(self,attr,attrval.astype(float))
-            logger.info("\t%s: %s", attr, str(getattr(self, attr).tolist()))
 
         # Check that the arrays we have been given match in shape where necessary.
         if (self.mmed.shape != self.mdm.shape) and not (len(self.mmed)==1 or len(self.mdm)==1) :

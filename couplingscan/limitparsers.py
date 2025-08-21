@@ -19,6 +19,12 @@ class CouplingLimit_Dijet(abc.ABC) :
 
     def __post_init__(self):
         logger.info("Initialising new CouplingLimit_Dijet with parameters:")
+        for attr in ["ECM", "pdfset"]:
+            if attr == "pdfset":
+                logger.info("\t%s (for signal sim.): %s", attr, str(getattr(self, attr)))
+            else:
+                logger.info("\tsqrt(%s) (GeV): %s", attr, str(np.sqrt(getattr(self, attr))))
+
         # Various safety controls:
         # If any starting parameter is just a float, make it into a 1-item array.
         # For all the others, make sure they have type float.
@@ -122,6 +128,13 @@ class CrossSectionLimit1D(abc.ABC):
     pdfset: str = "NNPDF30_nlo_as_0118" # default PDF set to use (customisable)
 
     def __post_init__(self):
+        # some logging for reference purposes
+        for attr in ["ECM", "pdfset"]:
+            if attr == "pdfset":
+                logger.info("\t%s (for signal sim.): %s", attr, str(getattr(self, attr)))
+            else:
+                logger.info("\tsqrt(%s) (GeV): %s", attr, str(np.sqrt(getattr(self, attr))))
+
         # Check that the arrays we have been given match in shape where necessary.
         # Observed limits:
         if type(self.xsec_limit) is dict :
@@ -299,7 +312,7 @@ class CrossSectionLimit_Dijet(CrossSectionLimit1D) :
             self.widths = list(self.xsec_limit.keys())
             self.xsec_limits = np.array([self.xsec_limit[i] for i in self.widths])
         else :
-            logger.error("You have supplied a single limit curve. This will be considered the appropriate limit for all signal points up to an intrinsic width to mass ratio of %s. To adjust the maximum intrinsic width, please set the value of max_intrinsic_width at initialisation or supply a dictionary instead. For intrinsic width to mass ratios larger than this value, a NaN will be returned.", str(self.max_intrinsic_width))
+            logger.warning("You have supplied a single limit curve. This will be considered the appropriate limit for all signal points up to an intrinsic width to mass ratio of %s. To adjust the maximum intrinsic width, please set the value of max_intrinsic_width at initialisation or supply a dictionary instead. For intrinsic width to mass ratios larger than this value, a NaN will be returned.", str(self.max_intrinsic_width))
             self.widths = [self.max_intrinsic_width]
             self.xsec_limits = np.array([self.xsec_limit])
 
