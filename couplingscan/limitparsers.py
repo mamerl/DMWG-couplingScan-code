@@ -15,6 +15,7 @@ class CouplingLimit_Dijet(abc.ABC) :
     gl: float
     coupling : str
     ECM: float = 13000.**2 # GeV^2 (i.e. s^2)
+    pdfset: str = "NNPDF30_nlo_as_0118" # default PDF set to use (customisable)
 
     def __post_init__(self):
         logger.info("Initialising new CouplingLimit_Dijet with parameters:")
@@ -76,6 +77,7 @@ class CouplingLimit_Dijet(abc.ABC) :
                 gdm=self.gdm,
                 gl=self.gl,
                 ECM=self.ECM,
+                pdfset=self.pdfset, # use the same PDF
             )
         else :
             plot_world = DMVectorModelScan(
@@ -85,6 +87,7 @@ class CouplingLimit_Dijet(abc.ABC) :
                 gdm=self.gdm,
                 gl=self.gl,
                 ECM=self.ECM,
+                pdfset=self.pdfset, # use the same PDF
             )
 
         # Interpolate input gq limit curve to get all the mass points we need
@@ -117,6 +120,7 @@ class CrossSectionLimit1D(abc.ABC):
     gl: float
     coupling : str
     ECM: float = 13000.**2 # GeV^2 (i.e. s^2)
+    pdfset: str = "NNPDF30_nlo_as_0118" # default PDF set to use (customisable)
 
     def __post_init__(self):
         # Check that the arrays we have been given match in shape where necessary.
@@ -211,6 +215,7 @@ class CrossSectionLimit1D(abc.ABC):
                 gdm=self.gdm,
                 gl=self.gl,
                 ECM=self.ECM,
+                pdfset=self.pdfset, # use the same PDF
             )
         else :
             plot_world = DMVectorModelScan(
@@ -220,6 +225,7 @@ class CrossSectionLimit1D(abc.ABC):
                 gdm=self.gdm,
                 gl=self.gl,
                 ECM=self.ECM,
+                pdfset=self.pdfset, # use the same PDF
             )
         xsec_plot_world = self.get_approx_xsec(plot_world)
 

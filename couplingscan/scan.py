@@ -61,6 +61,7 @@ class DMModelScan(abc.ABC):
     _coupling: str
 
     ECM: float = 13000.**2
+    pdfset: str = "NNPDF30_nlo_as_0118" # default PDF set to use (customisable)
 
     # Note: only doing up and down PDFs because I tested
     # with all 4 light quarks and saw no discernable difference.
@@ -74,12 +75,12 @@ class DMModelScan(abc.ABC):
     if (hasLHAPDF) :
         # this is the more modern setup using conda installed lhapdf
         import lhapdf
-        _wrapper = lhapdf.IntegrandHandler("NNPDF30_nlo_as_0118", ECM)
+        _wrapper = lhapdf.IntegrandHandler(pdfset, ECM)
     elif (hasLHAPDFWrap) :
         # this is the setup used for a standalone (non-conda)
         # lhapdf installation
         import lhapdfwrap
-        _wrapper = lhapdfwrap.IntegrandHandler("NNPDF30_nlo_as_0118", ECM)
+        _wrapper = lhapdfwrap.IntegrandHandler(pdfset, ECM)
 
     def __post_init__(self):
 
