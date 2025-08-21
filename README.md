@@ -24,8 +24,28 @@ python -m pip install -v git+https://github.com/LHC-DMWG/DMWG-couplingScan-code.
 
 ****
 
+## Conda installation instructions
 
-## To install LHAPDF 
+Conda provides both ROOT and LHAPDF from conda-forge. To quickly setup an environment suitable for running this code and visualising its output a pre-configured `conda` environment is provided.
+
+Once you have a working conda installation execute `source conda_install.sh` to prepare the environment. This should only be run once on any machine. When running code on the same machine thereafter simply execute `source conda_setup.sh` to configure the environment.
+
+For users with space restrictions presenting the installation of the main conda distribution, miniconda (https://www.anaconda.com/docs/getting-started/miniconda/main) provides a lightweight alternative.
+
+### Updating packages / python version
+Updates to packages and python versions should be made directly in `conda_environment.yml`. 
+
+The current version of the code uses:
+```
+python == 3.12
+lhapdf == 6.5.5
+root   == 6.32.10
+```
+To see the other dependency versions execute `conda list` after setting up the enviroment.
+
+## To install LHAPDF and PDF sets
+
+> This is not necessary if you use the conda installation mentioned earlier.
 
 If you don't have LHAPDF available, install it. After following the section "Quick start instructions" on https://lhapdf.hepforge.org/install.html, we have to download the data files for the PDF set we want to run with. Luckily, this is quite straightforward:
 
@@ -56,7 +76,7 @@ And you need lhapdf too. If you are on lxplus, lhapdf is already available. Plea
 ```
 LHAPDF_LIBRARY_PATH=/cvmfs/sft.cern.ch/lcg/external/lhapdfsets/current/:/cvmfs/sft.cern.ch/lcg/releases/LCG_97python3/MCGenerators/lhapdf/6.2.3/x86_64-centos7-gcc9-opt/share/LHAPDF/
 ```
-If it's set up correctly you shoudl also be able to run `lhapdf-config` and see some output (the help menu) indicating it correctly found that script. 
+If it's set up correctly you should also be able to run `lhapdf-config` and see some output (the help menu) indicating it correctly found that script. 
 
 If you're on your laptop and you want lhapdf, you'll have to install it yourself following the instructions above. You can use the `lhapdf-config` test again.
 
