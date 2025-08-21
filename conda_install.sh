@@ -24,6 +24,7 @@ LHAPDF_LIB_DIR=$(lhapdf-config --libdir)
 
 # install the pdf set
 lhapdf install NNPDF30_nlo_as_0118
+lhapdf install NNPDF30_nlo_as_0118_hessian
 
 # setup environment variables
 export LHAPDF_DATA_PATH=$LHAPDF_DATA_PATH:$LHAPDF_DATA_DIR
