@@ -32,6 +32,8 @@ Once you have a working conda installation execute `source conda_install.sh` to 
 
 For users with space restrictions presenting the installation of the main conda distribution, miniconda (https://www.anaconda.com/docs/getting-started/miniconda/main) provides a lightweight alternative.
 
+> The same `pip install -e .` command is run in the `conda_install.sh` script to install the modules defined in `src/lhapdf_integrands.*`.
+
 ### Updating packages / python version
 Updates to packages and python versions should be made directly in `conda_environment.yml`. 
 
@@ -40,6 +42,7 @@ The current version of the code uses:
 python == 3.12
 lhapdf == 6.5.5
 root   == 6.32.10
+pybind11
 ```
 To see the other dependency versions execute `conda list` after setting up the enviroment.
 

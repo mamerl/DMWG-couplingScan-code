@@ -1,7 +1,6 @@
 from setuptools import setup
-from pybind11.setup_helpers import Pybind11Extension, build_ext
+from pybind11.setup_helpers import Pybind11Extension
 import subprocess
-import sys
 
 # Detailed examples: 
 # https://github.com/pybind/pybind11_benchmark/blob/master/setup.py

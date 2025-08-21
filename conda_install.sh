@@ -17,16 +17,14 @@ conda env create -f conda_environment.yml -y
 # enter environment
 conda activate dmwg-coupling-scan 
 
-##### LHAPDF setup 
-# retrieve data directory
-LHAPDF_DATA_DIR=$(lhapdf-config --datadir)
-LHAPDF_LIB_DIR=$(lhapdf-config --libdir)
-
-# install the pdf set
+# LHAPDF setup 
+# install the pdf sets
 lhapdf install NNPDF30_nlo_as_0118
 lhapdf install NNPDF30_nlo_as_0118_hessian
 
-# setup environment variables
-export LHAPDF_DATA_PATH=$LHAPDF_DATA_PATH:$LHAPDF_DATA_DIR
-export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$LHAPDF_LIB_DIR
+# install the pybind11 code in src
+pip install -e .
 
+# source the setup script for other environment variables
+# to be set properly
+source setup.sh

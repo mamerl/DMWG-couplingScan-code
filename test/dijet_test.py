@@ -16,7 +16,7 @@ analysis_tag = "CMS-EXO-16-056"
 
 # Extract HEPData into useable format
 with open("dijet_hepdata/hepdata_gqplot_cms36ifb.json", "r") as read_file:
-  data = json.load(read_file)
+	data = json.load(read_file)
 invalues = data["values"]
 # And convert to x-y numpy arrays
 xlist = np.array([val["x"][0]["value"] for val in invalues]).astype(float)
@@ -40,11 +40,11 @@ target_yvals = np.linspace(0,1700,35)
 print(target_yvals)
 target_xgrid, target_ygrid = np.meshgrid(target_xvals,target_yvals)
 scan_A1 = DMAxialModelScan(
-mmed=target_xgrid.flatten(),
-mdm=target_ygrid.flatten(),
-gq=0.25,
-gdm=1.0,
-gl=0.0,
+	mmed=target_xgrid.flatten(),
+	mdm=target_ygrid.flatten(),
+	gq=0.25,
+	gdm=1.0,
+	gl=0.0,
 )
 
 values = gq_limit.extract_exclusion_depths(scan_A1)
@@ -132,12 +132,12 @@ for scanname in ["a1","v1"] :
     draw_contours.append(thisline)
   
   if "a1" in scanname : 
-    text = "Axial-vector\ng$_q$=0.25, g$_\chi$=1.0, g$_l$=0.0"
+    text = r"Axial-vector\n$g_q$=0.25, $g_\chi$=1.0, g$_l$=0.0"
     values_new_A1 = xsec_limit.extract_exclusion_depths(scan_A1)
     x, y, z = clean_grid(scan_A1.mmed, scan_A1.mdm, values_new_A1)
     make_plot(x, y, z, [500, 3500], [0, 1700], analysis_tag, "A1_from_approx_xsec", addText=text, addCurves=draw_contours, addPoints=True)
   else : 
-    text = "Vector\ng$_q$=0.25, g$_\chi$=1.0, g$_l$=0.0"
+    text = r"Vector\n$g_q$=0.25, $g_\chi$=1.0, $g_l$=0.0"
     values_new_V1 = xsec_limit.extract_exclusion_depths(scan_V1)
     x, y, z = clean_grid(scan_V1.mmed, scan_V1.mdm, values_new_V1)
     make_plot(x, y, z, [500, 3500],[0, 1700], analysis_tag, "V1_from_approx_xsec", addText=text, addCurves=draw_contours, addPoints=True)

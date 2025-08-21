@@ -7,8 +7,7 @@ import scipy.integrate as integrate
 from couplingscan.logger_setup import logger
 
 # check if lhapdf is available
-hasLHAPDF = importlib.util.find_spec('lhapdf') is not None # package name for conda installed version
-hasLHAPDFWrap = importlib.util.find_spec('lhapdfwrap') is not None # old package name
+hasLHAPDF = importlib.util.find_spec('lhapdfwrap') is not None
 
 PI = np.pi
 
@@ -73,12 +72,6 @@ class DMModelScan(abc.ABC):
     # To determine reliably from here, check for generated file.
     _wrapper = None
     if (hasLHAPDF) :
-        # this is the more modern setup using conda installed lhapdf
-        import lhapdf
-        _wrapper = lhapdf.IntegrandHandler(pdfset, ECM)
-    elif (hasLHAPDFWrap) :
-        # this is the setup used for a standalone (non-conda)
-        # lhapdf installation
         import lhapdfwrap
         _wrapper = lhapdfwrap.IntegrandHandler(pdfset, ECM)
 
