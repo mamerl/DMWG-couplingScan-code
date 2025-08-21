@@ -3,14 +3,12 @@ from enum import Enum
 import numpy as np
 import abc
 import imp
+import importlib
 import scipy.integrate as integrate
 
-# Check if lhapdf was available at compile time. 
-try:
-    imp.find_module('lhapdfwrap')
-    hasLHAPDF = True
-except:
-    hasLHAPDF = False
+# check if lhapdf is available
+hasLHAPDF = importlib.util.find_spec('lhapdf') is not None # package name for conda installed version
+hasLHAPDFWrap = importlib.util.find_spec('lhapdfwrap') is not None # old package name
 
 PI = np.pi
 
@@ -74,8 +72,14 @@ class DMModelScan(abc.ABC):
     # To determine reliably from here, check for generated file.
     _wrapper = None
     if (hasLHAPDF) :
-        import lhapdfwrap as pdfwrap
-        _wrapper = pdfwrap.IntegrandHandler("NNPDF30_nlo_as_0118", ECM)
+        # this is the more modern setup using conda installed lhapdf
+        import lhapdf
+        _wrapper = lhapdf.IntegrandHandler("NNPDF30_nlo_as_0118", ECM)
+    elif (hasLHAPDFWrap) :
+        # this is the setup used for a standalone (non-conda)
+        # lhapdf installation
+        import lhapdfwrap
+        _wrapper = lhapdfwrap.IntegrandHandler("NNPDF30_nlo_as_0118", ECM)
 
     def __post_init__(self):
 
