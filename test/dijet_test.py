@@ -83,17 +83,17 @@ make_plot(scan_V2.mmed, scan_V2.mdm, V2_direct, [500, 3500], [0, 1700], analysis
 xvals = []
 yvals = []
 with open("dijet_hepdata/approximate_theorycurve.txt","r") as read_file :
-  lines = read_file.readlines()
-  for line in lines :
-    tokens = line.split(", ")
-    xvals.append(float(tokens[0]))
-    yvals.append(float(tokens[1]))
+	lines = read_file.readlines()
+	for line in lines :
+		tokens = line.split(", ")
+		xvals.append(float(tokens[0]))
+		yvals.append(float(tokens[1]))
 x_theory = np.array(xvals)
 y_theory = np.array(yvals)
 
 # Now get the 1D observed cross section limit for 11a.
 with open("dijet_hepdata/hepdata_crosssectionlimit_cms36ifb.json", "r") as read_file:
-  data = json.load(read_file)
+	data = json.load(read_file)
 xsecvalues = data["values"]
 xlist_xsec = np.array([val["x"][0]["value"] for val in xsecvalues]).astype(float)
 ylist_xsec = np.array([val["y"][2]["value"] for val in xsecvalues]).astype(float)
@@ -104,43 +104,43 @@ make_xsec_plot(xlist_xsec,ylist_xsec,x_theory,y_theory,analysis_tag,"check_1dinp
 
 # And set this as input for the new scan.
 xsec_limit = CrossSectionLimit_Dijet(
-  mmed_limit=xlist_xsec,
-  xsec_limit=ylist_xsec,
-  mmed_theory=x_theory,
-  xsec_theory=y_theory,
-  mdm=1,
-  gq=0.25,
-  gdm=1.0,
-  gl=0.0,
-  coupling='vector',
-  max_intrinsic_width=0.15
+	mmed_limit=xlist_xsec,
+	xsec_limit=ylist_xsec,
+	mmed_theory=x_theory,
+	xsec_theory=y_theory,
+	mdm=1,
+	gq=0.25,
+	gdm=1.0,
+	gl=0.0,
+	coupling='vector',
+	max_intrinsic_width=0.15
 )
 
 # Get paper exclusion limits and make them into contours.
 for scanname in ["a1","v1"] :
-  draw_contours = []
-  for contour_i in [1,2] :
-    contour_x = []
-    contour_y = []
-    with open("dijet_hepdata/{0}_contour_{1}.txt".format(scanname,contour_i),"r") as read_file :
-      lines = read_file.readlines()
-      for line in lines :
-        tokens = line.split(", ")
-        contour_x.append(float(tokens[0]))
-        contour_y.append(float(tokens[1]))
-    thisline = plt.Line2D(contour_x, contour_y,lw = 2, color ='red')
-    draw_contours.append(thisline)
-  
-  if "a1" in scanname : 
-    text = r"Axial-vector\n$g_q$=0.25, $g_\chi$=1.0, g$_l$=0.0"
-    values_new_A1 = xsec_limit.extract_exclusion_depths(scan_A1)
-    x, y, z = clean_grid(scan_A1.mmed, scan_A1.mdm, values_new_A1)
-    make_plot(x, y, z, [500, 3500], [0, 1700], analysis_tag, "A1_from_approx_xsec", addText=text, addCurves=draw_contours, addPoints=True)
-  else : 
-    text = r"Vector\n$g_q$=0.25, $g_\chi$=1.0, $g_l$=0.0"
-    values_new_V1 = xsec_limit.extract_exclusion_depths(scan_V1)
-    x, y, z = clean_grid(scan_V1.mmed, scan_V1.mdm, values_new_V1)
-    make_plot(x, y, z, [500, 3500],[0, 1700], analysis_tag, "V1_from_approx_xsec", addText=text, addCurves=draw_contours, addPoints=True)
+	draw_contours = []
+	for contour_i in [1,2] :
+		contour_x = []
+		contour_y = []
+		with open("dijet_hepdata/{0}_contour_{1}.txt".format(scanname,contour_i),"r") as read_file :
+			lines = read_file.readlines()
+			for line in lines :
+				tokens = line.split(", ")
+				contour_x.append(float(tokens[0]))
+				contour_y.append(float(tokens[1]))
+				thisline = plt.Line2D(contour_x, contour_y,lw = 2, color ='red')
+				draw_contours.append(thisline)
+	
+	if "a1" in scanname : 
+		text = "Axial-vector" + "\n" + r"$g_q$=0.25, $g_\chi$=1.0, g$_l$=0.0"
+		values_new_A1 = xsec_limit.extract_exclusion_depths(scan_A1)
+		x, y, z = clean_grid(scan_A1.mmed, scan_A1.mdm, values_new_A1)
+		make_plot(x, y, z, [500, 3500], [0, 1700], analysis_tag, "A1_from_approx_xsec", addText=text, addCurves=draw_contours, addPoints=True)
+	else : 
+		text = "Vector" + "\n" + r"$g_q$=0.25, $g_\chi$=1.0, $g_l$=0.0"
+		values_new_V1 = xsec_limit.extract_exclusion_depths(scan_V1)
+		x, y, z = clean_grid(scan_V1.mmed, scan_V1.mdm, values_new_V1)
+		make_plot(x, y, z, [500, 3500],[0, 1700], analysis_tag, "V1_from_approx_xsec", addText=text, addCurves=draw_contours, addPoints=True)
 
 # These don't match quite as exactly, because this method of extracting the cross section is a little wonky,
 # but you can see that the two results are equivalent so long as the inputs are equivalent.
