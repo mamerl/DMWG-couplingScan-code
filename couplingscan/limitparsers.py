@@ -14,7 +14,7 @@ class CouplingLimit_Dijet(abc.ABC) :
     gdm: float
     gl: float
     coupling : str
-    ECM: float = 13000.**2 # GeV^2 (i.e. s^2)
+    ECM: float = 13000.**2 # GeV^2 (i.e. s)
     pdfset: str = "NNPDF30_nlo_as_0118" # default PDF set to use (customisable)
 
     def __post_init__(self):
@@ -97,7 +97,7 @@ class CouplingLimit_Dijet(abc.ABC) :
 
         # Interpolate input gq limit curve to get all the mass points we need
         # Any points in grid that are actually above or below analysis mmed
-        # values should never be excluded, so we give them a very large value        
+        # values should never be excluded, so we give them a very large value
         interpolated_limit_gq = np.interp(scan.mmed, self.mmed, self.gq_limits,left=10.,right=10.)
 
         # This math comes from the CMS original versions of the calculation, and works well, 
@@ -124,7 +124,7 @@ class CrossSectionLimit1D(abc.ABC):
     gdm: float
     gl: float
     coupling : str
-    ECM: float = 13000.**2 # GeV^2 (i.e. s^2)
+    ECM: float = 13000.**2 # GeV^2 (i.e. s)
     pdfset: str = "NNPDF30_nlo_as_0118" # default PDF set to use (customisable)
 
     def __post_init__(self):

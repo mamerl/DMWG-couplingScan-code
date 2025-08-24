@@ -95,16 +95,16 @@ class DMModelScan(abc.ABC):
 
         # Check that the arrays we have been given match in shape where necessary.
         if (self.mmed.shape != self.mdm.shape) and not (len(self.mmed)==1 or len(self.mdm)==1) :
-            logger.error("Error: mass points have mismatching shapes!")
-            logger.error("These are meant to be matching x and y values. Please fix.")
+            logger.error("mass points have mismatching shapes!")
+            logger.error("these are meant to be matching x and y values. Please fix.")
             exit(1)
         if not (self.gq.shape == self.gdm.shape == self.gl.shape) :
-            logger.error("Error: coupling points have mismatching shapes!")
-            logger.error("Each point in your reference scan must have exactly one gq, gdm, and gl.")
+            logger.error("coupling points have mismatching shapes!")
+            logger.error("each point in your reference scan must have exactly one gq, gdm, and gl.")
             exit(1)
         # Only need to check one of these now because we know they match
         if not (len(self.gq) == 1 or len(self.gq) == len(self.mmed)) :
-            logger.error("Couplings arrays must either be the same length as mass arrays or hold exactly 1 value")
+            logger.error("couplings arrays must either be the same length as mass arrays or hold exactly 1 value")
             exit(1)
 
     @abc.abstractmethod
