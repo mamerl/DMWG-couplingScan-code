@@ -11,6 +11,7 @@ class CouplingLimit_Dijet(abc.ABC) :
     mmed: float
     gq_limits: float
     mdm: float
+    mdm_is_fraction: bool = False
     gdm: float
     gl: float
     coupling : str
@@ -72,12 +73,18 @@ class CouplingLimit_Dijet(abc.ABC) :
         # Extract full cross sections for target scan scenario.
         xsec_scan = scan.mediator_partial_width_quarks()**2/scan.mediator_total_width()
 
+        # if the DM mass is given as a fraction of the mediator mass,
+        # recalculate it here for the scan.mmed grid we're using
+        mdm_scan = self.mdm # nominal value is single fixed DM mass
+        if self.mdm_is_fraction:
+            mdm_scan = scan.mmed * self.mdm
+
         # Create scan in world of input plot.
         # Need a placeholder gq around which we interpret: pick 1.
         if self.coupling == 'axial' :
             plot_world = DMAxialModelScan(
                 mmed=scan.mmed,
-                mdm=self.mdm,
+                mdm=mdm_scan,
                 gq=1.0,
                 gdm=self.gdm,
                 gl=self.gl,
@@ -87,7 +94,7 @@ class CouplingLimit_Dijet(abc.ABC) :
         else :
             plot_world = DMVectorModelScan(
                 mmed=scan.mmed,
-                mdm=self.mdm,
+                mdm=mdm_scan,
                 gq=1.0,
                 gdm=self.gdm,
                 gl=self.gl,
