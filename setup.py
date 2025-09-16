@@ -7,8 +7,8 @@ import subprocess
 # https://github.com/wichert/pybind11-example/blob/master/setup.py
 def found_lhapdf() :
     try :
-        config = subprocess.check_output(["lhapdf-config"]).decode('ascii').strip()
-        print("Got config:")
+        config = subprocess.check_output(["lhapdf-config", "--version"]).decode('ascii').strip()
+        print("Got LHAPDF version:")
         print(config)
         return True
     except :
