@@ -11,12 +11,12 @@ class CouplingLimit_Dijet(abc.ABC) :
     mmed: float
     gq_limits: float
     mdm: float
-    mdm_is_fraction: bool = False
     gdm: float
     gl: float
     coupling : str
     ECM: float = 13000.**2 # GeV^2 (i.e. s)
     pdfset: str = "NNPDF30_nlo_as_0118" # default PDF set to use (customisable)
+    mdm_is_fraction: bool = False
 
     def __post_init__(self):
         logger.info("Initialising new CouplingLimit_Dijet with parameters:")
