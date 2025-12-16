@@ -44,14 +44,10 @@ class CouplingLimit_Dijet(abc.ABC) :
         # Check that the arrays we have been given have the shapes we expect.
         # For the 1d visible limit like this, we expect mmed and one of the visible couplings to match.
         # The other has to have a single value, and there can be only one value of mdm.
-        if (len(np.unique(self.mdm)) > 1):
-            if len(self.mdm) == len(self.mmed):
-                # this case is allowed, you can then have a DM mass for each of the mediator masses
-                logger.info("found coupling limit with variable DM mass, is this expected?")
-            else:
-                logger.error("Error: there should be a fixed DM mass for this type of limit!")
-                logger.error("If you are treating DM as decoupled, you can just set that value very high.")
-                sys.exit(1)
+        if (len(self.mdm) > 1):
+            logger.error("Error: there should be a fixed DM mass for this type of limit!")
+            logger.error("If you are treating DM as decoupled, you can just set that value very high.")
+            sys.exit(1)
         if self.mdm_is_fraction and len(self.mdm) > 1:
             logger.error("Error: when treating the DM mass as a fraction of the mediator mass, only a single fraction value is allowed for mdm!")
             sys.exit(1)
